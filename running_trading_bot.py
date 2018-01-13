@@ -14,6 +14,7 @@ import korbit_rule
 import telegram
 import coin
 import property
+import korbit_status
 
 myProperty = property.local_property()
 
@@ -38,19 +39,24 @@ def refreshTokens():
     print("at = \"" + api.getAccessToken() + "\"")
     print("rt = \"" + api.getRefreshToken() + "\"")
 
-@sched.scheduled_job('interval', seconds=180)
+@sched.scheduled_job('interval', seconds=60)
 def mainProcess():
     msg = telegram.message()
     # 각 코인 마다 api 호출해서 가격 얻어오고 db 에 저장하고, 룰 매칭되는지 여부 확인해서 룰 매칭되면 구입!
     for i, currencyPair in enumerate(currency_pair_list):
         rule1.checkRule(msg, db, api, currencyPair)
+    if (korbit_status.hasOrderNotFinished(db)):
+        korbit_status.updateLastBalance(api, db)
 
-@sched.scheduled_job('cron', day_of_week='mon-sun', hour=11, minute=50)
-def alertSell():
-    msg = telegram.message()
-    msg.sendMsg(myProperty.getMyChatId(), "[룰1] 구입했다면 파세요! (매일11시50분에 항상 오는 메시지)")
+#@sched.scheduled_job('cron', day_of_week='mon-sun', hour=11, minute=50)
+#def alertSell():
+#    msg = telegram.message()
+#    msg.sendMsg(myProperty.getMyChatId(), "[룰1] 구입했다면 파세요! (매일11시50분에 항상 오는 메시지)")
+
 
 mainProcess()
+korbit_status.updateLastBalance(api, db)
+
 
 executors = {
     'default': {'type': 'threadpool', 'max_workers': 20},

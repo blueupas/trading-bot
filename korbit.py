@@ -50,6 +50,12 @@ class KorbitApi:
         resp = requests.get(url).text
         return resp
 
+    def getBalance(self):
+        url = "https://api.korbit.co.kr/v1/user/balances"
+        headers = {'Authorization': 'Bearer ' + self.accessToken}
+        return requests.get(url, headers=headers).text
+
+
     def getUserInfo(self):
         url = "https://api.korbit.co.kr/v1/user/info"
         headers = {'Authorization': 'Bearer ' + self.accessToken}

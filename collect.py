@@ -33,6 +33,21 @@ class TradingDB:
         insertData = (currencyPair, amount)
         self.queryCommit("insert into rule1_trigger_amount (currency_pair, trigger_amount, state) values (%s, %s, 'wait')", insertData)
 
+    def getBalance(self, currency):
+        rows = self.querySelect("select currency, in_krw, total, available, trade_in_use, withdrawal_in_use from balances where currency = %s order by datetime desc", (currency))
+        keyname = ('currency', 'in_krw', 'total', 'available', 'trade_in_use', 'withdrawal_in_use')
+        map = []
+        i=0
+        for value in rows[0]:
+            map.append((keyname[i], value))
+            i += 1
+        return dict(map)
+
+    def insertBalance(self, currency, in_krw, total, available, trade_in_use, withdrawal_in_use):
+        insertData = (currency, in_krw, total, available, trade_in_use, withdrawal_in_use)
+        print("insert balance - " + str(insertData))
+        self.queryCommit("insert into balances (currency, in_krw, total, available, trade_in_use, withdrawal_in_use) values (%s, %s, %s, %s, %s, %s)", insertData)
+
     def cancelWait(self):
         self.queryCommit("update rule1_trigger_amount set state='canceled' where state='wait'", None)
 

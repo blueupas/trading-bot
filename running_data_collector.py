@@ -33,7 +33,7 @@ def saveTriggerAmount():
         rule1.saveTriggerAmount(db, currencyPair, amount)
 
 
-@sched.scheduled_job('interval', seconds=180)
+@sched.scheduled_job('interval', seconds=60)
 def collectTick():
     # 각 코인 마다 api 호출해서 가격 얻어오고 db 에 저장
     for i, currencyPair in enumerate(currency_pair_list):
@@ -41,6 +41,8 @@ def collectTick():
         print("resp:" + resp)
         tickData = json.loads(resp)
         db.insertTick(currencyPair, tickData)
+
+
 
 collectTick()
 
