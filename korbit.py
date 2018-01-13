@@ -60,8 +60,13 @@ class KorbitApi:
         headers = {'Authorization': 'Bearer ' + self.accessToken}
         return requests.get(url, headers=headers).text
 
-    def getOrderBook(self, currency):
-        url = "https://api.korbit.co.kr/v1/orderbook?currency_pair=" + currency
+    def getOrderBook(self, currencyPair):
+        url = "https://api.korbit.co.kr/v1/orderbook?currency_pair=" + currencyPair
+        resp = requests.get(url).text
+        return resp
+
+    def getTransaction(self, currencyPair):
+        url = "https://api.korbit.co.kr/v1/transactions?currency_pair=" + currencyPair + "&time=minute"
         resp = requests.get(url).text
         return resp
 
@@ -71,5 +76,4 @@ class KorbitApi:
         data = {'currency_pair': currencyPair, 'type': 'limit', 'price': coinPrice,
                 'coin_amount': coinAmount, 'nonce':self.getNonce()}
         return requests.post(url, data=data, headers=headers)
-
 

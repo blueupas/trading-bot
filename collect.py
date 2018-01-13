@@ -64,8 +64,15 @@ class TradingDB:
         print("insert balance - " + str(insertData))
         self.queryCommit("insert into balances (currency, in_krw, total, available, trade_in_use, withdrawal_in_use) values (%s, %s, %s, %s, %s, %s)", insertData)
 
-    def cancelWait(self):
-        self.queryCommit("update rule1_trigger_amount set state='canceled' where state='wait'", None)
+    def insertTransaction(self, currency, row):
+        tablename = "transaction_" + currency
+        insertData = (row['timestamp'], int(row['tid']), int(row['price']), float(row['amount']))
+        try:
+            self.queryCommit(
+                "insert into " + tablename + " (timestamp, tid, price, amount) values (%s, %s, %s, %s)",
+                insertData)
+        except pymysql.err.IntegrityError as e:
+            print(e)
 
     def getLastNonce(self):
         ret = 0
@@ -134,3 +141,4 @@ class TradingDB:
         cursor.execute("update scribe set sliencemode=0 where memid=%s", updateData)
         db.commit()
         db.close()
+

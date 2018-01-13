@@ -59,9 +59,20 @@ def collectOrderBook():
         db.insertOrder(currencyPair, timestamp, lastPrice, asksOrderVolume, bidsOrderVolume)
 
 
+
+@sched.scheduled_job('interval', seconds=50)
+def collectTransaction():
+    # 각 코인 마다 api 호출해서 체결된 녀석 얻어와서 db 에 저장
+    for i, currencyPair in enumerate(currency_pair_list):
+        resp = api.getTransaction(currencyPair)
+        data = json.loads(resp)
+        for row in data:
+            db.insertTransaction(currencyPair[:3], row)
+
+
 collectTick()
 collectOrderBook()
-
+collectTransaction()
 
 executors = {
     'default': {'type': 'threadpool', 'max_workers': 20},
