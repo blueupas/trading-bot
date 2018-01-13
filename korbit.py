@@ -55,11 +55,15 @@ class KorbitApi:
         headers = {'Authorization': 'Bearer ' + self.accessToken}
         return requests.get(url, headers=headers).text
 
-
     def getUserInfo(self):
         url = "https://api.korbit.co.kr/v1/user/info"
         headers = {'Authorization': 'Bearer ' + self.accessToken}
         return requests.get(url, headers=headers).text
+
+    def getOrderBook(self, currency):
+        url = "https://api.korbit.co.kr/v1/orderbook?currency_pair=" + currency
+        resp = requests.get(url).text
+        return resp
 
     def buy(self, coinPrice, coinAmount, currencyPair):
         url = "https://api.korbit.co.kr/v1/user/orders/buy"

@@ -32,7 +32,6 @@ def updateLastBalance(api, db):
         jsonData[currency]['in_krw'] = convertKrw(db, currency, jsonData[currency]['total'])
         db.insertBalance(currency, jsonData[currency]['in_krw'], jsonData[currency]['total'], jsonData[currency]['available'], jsonData[currency]['trade_in_use'], jsonData[currency]['withdrawal_in_use'])
 
-
 def getMsgStrForBalance(db):
     msg = ""
     for currency in ['krw', 'btc', 'bch', 'eth', 'xrp']:
@@ -42,6 +41,7 @@ def getMsgStrForBalance(db):
             msg += "\n"
         else :
             msg +=  "  (=" + format(data['total'], "_>-012,.6f") + ")" + "\n"
+        msg += data['currency'] + " in trading : " + format(data['trade_in_use'], "_>-012,.6f") + "\n"
     return msg
 
 

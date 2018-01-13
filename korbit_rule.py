@@ -6,16 +6,16 @@ import telegram
 import coin
 import property
 import korbit_status
+import market_calc
 
 myProperty = property.local_property()
 
 class korbitRule1:
 
-    def saveTriggerAmount(self, db, currency_pair, amount):
-        db.insertTriggerAmount(currency_pair, amount)
-
-    def getTriggerAmount(self, db, currency_pair):
-        return db.getTriggerAmount(currency_pair)
+    def isMatched(self, db, currencyPair):
+        market_calc.getSellPower(db, currencyPair)
+        ## TODO 기존 룰 없애고 새로운 룰 넣기 
+        return False
 
     def sellCoin(self, db, api):
         # TODO 판매한 뒤 balance table 갱신해주기
@@ -36,14 +36,9 @@ class korbitRule1:
         msg.sendMsgAll(db, "[룰1] 구입해서 적당한 시점에 파세요! 구입할것:" + currencyPair + ", 기준가격:" + str(triggerAmount) + ", 현재가격:" + str(lastPrice))
 
     def checkRule(self, msg, db, api, currencyPair):
-        lastPrice = db.getLastPrice(currencyPair)
-        triggerAmount = self.getTriggerAmount(db, currencyPair)
-        if (triggerAmount != 0 and lastPrice > triggerAmount):
-            print("matched! " + currencyPair + ", threashold:" + str(triggerAmount) + ", current:" + str(lastPrice))
-            self.buyCoin(msg, db, api, currencyPair, triggerAmount)
-            self.sendBuyMsg(msg, db, currencyPair, triggerAmount, lastPrice)
-        else:
-            print ("not matched! " + currencyPair + ", threashold:" + str(triggerAmount) + ", current:" + str(lastPrice))
+        if (self.isMatched(db, currencyPair)):
+            #self.buyCoin(msg, db, api, currencyPair, triggerAmount)
+            self.sendBuyMsg(msg, db, currencyPair, 0, 0)
 
 
 
